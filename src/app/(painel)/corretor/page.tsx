@@ -13,10 +13,10 @@ import { MesSelect } from "@/components/nav";
 export const metadata = { title: "Corretor · Painéis Casagrande" };
 
 export default async function CorretorPage(props: PageProps<"/corretor">) {
-  const profile = await requireProfile();
   const sp = await props.searchParams;
   const mes = resolveMes(sp.mes);
-  const ctx = await loadCtx(mes);
+  // em paralelo: o redirect de requireProfile acontece antes de qualquer dado ser renderizado
+  const [profile, ctx] = await Promise.all([requireProfile(), loadCtx(mes)]);
 
   // ——— quem é o dono dos dados desta tela ———
   // Corretor: SEMPRE o próprio vínculo do profile. Qualquer ?u= é ignorado.

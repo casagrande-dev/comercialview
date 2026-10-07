@@ -14,17 +14,19 @@ export type Profile = {
 };
 
 /**
- * Sessão verificada no servidor (getUser valida o JWT com o Supabase Auth — não confia só no cookie).
+ * Sessão verificada no servidor: getClaims valida a assinatura do JWT (não confia só no cookie).
+ * O perfil é relido a cada requisição, então desativar uma conta corta o acesso na hora.
  * Memoizada por requisição.
  */
 export const getSessionProfile = cache(async (): Promise<Profile | null> => {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
+  const { data, error } = await supabase.auth.getClaims();
+  const userId = data?.claims?.sub;
+  if (error || !userId) return null;
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, nome, email, role, pipedrive_user_id, ativo, must_change_password")
-    .eq("id", data.user.id)
+    .eq("id", userId)
     .single<Profile>();
   if (!profile || !profile.ativo) return null;
   return profile;

@@ -12,10 +12,9 @@ import { MesSelect } from "@/components/nav";
 export const metadata = { title: "Diretoria · Painéis Casagrande" };
 
 export default async function DiretoriaPage(props: PageProps<"/diretoria">) {
-  await requireGestor();
   const sp = await props.searchParams;
   const mes = resolveMes(sp.mes);
-  const [ctx, metasAno] = await Promise.all([loadCtx(mes), loadMetasAno(mes.slice(0, 4))]);
+  const [, ctx, metasAno] = await Promise.all([requireGestor(), loadCtx(mes), loadMetasAno(mes.slice(0, 4))]);
   const d = painelDiretoria(ctx, metasAno);
   const corrente = monthOf(ctx.hoje) === mes;
   const dia = corrente ? Number(ctx.hoje.slice(8)) : null;

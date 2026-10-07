@@ -17,10 +17,9 @@ const corSt = { good: "var(--good)", warn: "var(--warn)", crit: "var(--crit)", m
 const rotSt = { good: "no ritmo", warn: "atenção", crit: "crítico", mute: "—" } as const;
 
 export default async function GerentePage(props: PageProps<"/gerente">) {
-  await requireGestor();
   const sp = await props.searchParams;
   const mes = resolveMes(sp.mes);
-  const ctx = await loadCtx(mes);
+  const [, ctx] = await Promise.all([requireGestor(), loadCtx(mes)]);
   const g = painelGerente(ctx);
   const L = g.linhas;
   const curto = (n: string) => n.split(" ")[0];
